@@ -8,8 +8,9 @@
 *
 *************************************************************************/
 
-#include "system.h"
-#include "lap.cpp"
+#include "lapjv.hpp"
+#include <random>
+#include <stdio.h>
 
 #define COSTRANGE 1000.0
 #define PRINTCOST 1
@@ -17,16 +18,12 @@ typedef int cost;
 int main()
 {
 
-  int dim, startdim, enddim;
+  int dim, startdim = 4, enddim = 4;
   cost **assigncost, *u, *v, lapcost;
   int i, *colsol;
   int j, *rowsol;
-  double runtime;
 
-  printf("start dimension ?\n");
-  scanf("%d", &startdim);
-  printf("end dimension ?\n");
-  scanf("%d", &enddim);
+
   printf("\ndimensions %d .. %d\n", startdim, enddim);
 
   assigncost = new cost *[enddim];
@@ -37,20 +34,15 @@ int main()
   colsol = new int[enddim];
   u = new cost[enddim];
   v = new cost[enddim];
-
+std::random_device rd; 
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(0, COSTRANGE); 
   for (dim = startdim; dim <= enddim; dim++)
   {
-    seedRandom(1000 * dim);
-    /* in Visual C++ the first random numbers are not very random.
-       call random couple of times before we really start. */
-    random();
-    random();
-    random();
-    random();
-    random();
+   
     for (i = 0; i < dim; i++)
       for (j = 0; j < dim; j++)
-        assigncost[i][j] = (cost)(random() * (double)COSTRANGE);
+        assigncost[i][j] = (cost)(distr(gen));
 
 #if (PRINTCOST)
     for (i = 0; i < dim; i++)
@@ -60,12 +52,9 @@ int main()
         printf("%4d ", assigncost[i][j]);
     }
 #endif
-
-    printf("\nstart\n");
-    runtime = seconds();
+  
     lapcost = lap<int>(dim, assigncost, rowsol, colsol, u, v, 100000);
-    runtime = seconds() - runtime;
-    printf("\n\ndim  %4d - lap cost %5d - runtime %6.3f\n", dim, lapcost, runtime);
+    printf("\n\ndim  %4d - lap cost %5d\n", dim, lapcost);
 
     checklap<int>(dim, assigncost, rowsol, colsol, u, v);
   }
@@ -76,8 +65,5 @@ int main()
   delete[] u;
   delete[] v;
 
-  printf("\n\npress key\n");
-  char c;
-  scanf("%d", ((int *)&c));
   return 0;
 }

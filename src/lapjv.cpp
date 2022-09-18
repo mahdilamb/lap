@@ -15,8 +15,8 @@
    R. Jonker and A. Volgenant, University of Amsterdam.
 *
 *************************************************************************/
-
-#include "system.h"
+#include <stdio.h>
+#include  "lapjv.hpp"
 typedef int row;
 typedef int col;
 template <typename cost>
@@ -26,7 +26,7 @@ int lap(int dim,
         row *colsol,
         cost *u,
         cost *v,
-        const cost nonassignmentcost = 100000)
+        const cost nonassignmentcost)
 
 // input:
 // dim        - problem size
@@ -239,9 +239,10 @@ int lap(int dim,
                 unassignedfound = true;
                 break;
               }
-              // else add to list to be scanned right away.
               else
               {
+                // else add to list to be scanned right away.
+
                 collist[k] = collist[up];
                 collist[up++] = j;
               }
@@ -358,3 +359,18 @@ void checklap(int dim, cost **assigncost,
   delete[] matched;
   return;
 }
+
+template int lap(int dim,
+        int **assigncost,
+        col *rowsol,
+        row *colsol,
+        int *u,
+        int *v,
+        const int nonassignmentcost);
+
+template void checklap(int dim,
+        int **assigncost,
+        col *rowsol,
+        row *colsol,
+        int *u,
+        int *v);

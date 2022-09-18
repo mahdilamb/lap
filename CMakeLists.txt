@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 20)
 include(CTest)
 enable_testing()
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
-add_executable(lapjv lapmain.cpp src/lap.cpp src/system.cpp)
+add_executable(lapjv lapmain.cpp src/lapjv.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
