@@ -12,7 +12,6 @@ int lap(int dim,
         cost *v,
         const cost nonassignmentcost);
 
-
 template <typename cost>
 void checklap(int dim, cost **assigncost,
               col *rowsol, row *colsol, cost *u, cost *v);
