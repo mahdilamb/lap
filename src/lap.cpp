@@ -26,7 +26,7 @@ int lap(int dim,
         row *colsol,
         cost *u,
         cost *v,
-        const cost nonassignmentcost)
+        const cost nonassignmentcost = 100000)
 
 // input:
 // dim        - problem size
