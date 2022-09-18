@@ -85,40 +85,16 @@ void array_printer(const cost **assigncost, int dim)
   std::cout << "]" << std::endl;
 }
 
-void cost_printer(const cost **assigncost, int dim)
-{
-  int i, j;
-  std ::cout << "    ";
-  for (j = 0; j < dim; j++)
-    std::cout << std::setw(4) << j << " ";
-
-  for (i = 0; i < dim; i++)
-  {
-    std::cout << std::endl
-              << std::setw(4) << i;
-    for (j = 0; j < dim; j++)
-      std::cout << std::setw(4) << assigncost[i][j];
-  }
-  std::cout << std::endl;
-}
-
 int main(int argc, char *argv[])
 {
   int cost_range = 1000;
-  bool print_cost = true;
-  bool print_array = false;
+  bool print_array = true;
   int dim = 4;
-  std::set<std::string> flags{"--print-array", "--print-matrix", "--help"};
-  std::map<std::string, std::string> arg_descriptions
-  {
-    {
-        "--dim", "(int) Dimension of the matrix"},
-        {"--print-matrix", "If present will print the cost matrix"},
-        {"--print-array", "If present will print the cost matrix in a form that makes it easier to copy into other languages (e.g. python)"},
-    {
-      "--cost-range", "The upper limit of the random numbers used for the cost matrix"
-    }
-  };
+  std::set<std::string> flags{"--print-array", "--help"};
+  std::map<std::string, std::string> arg_descriptions{
+      {"--dim", "(int) Dimension of the matrix"},
+      {"--print-array", "If present will print the cost matrix in a form that makes it easier to copy into other languages (e.g. python)"},
+      {"--cost-max", "The upper limit of the random numbers used for the cost matrix"}};
   argmap args{
       {"--dim", [&dim](char *new_dim)
        {
@@ -140,11 +116,7 @@ int main(int argc, char *argv[])
        {
          print_array = true;
        }},
-      {"--print-matrix", [&print_cost](char *ignored)
-       {
-         print_cost = true;
-       }},
-      {"--cost-range", [&cost_range](char *new_cost_range)
+      {"--cost-max", [&cost_range](char *new_cost_range)
        {
          cost_range = stoi(std::string(new_cost_range));
        }}};
@@ -164,10 +136,6 @@ int main(int argc, char *argv[])
   v = new cost[dim];
   fill_with_random(assigncost, dim, cost_range);
 
-  if (print_cost)
-  {
-    cost_printer(const_cast<const cost **>(assigncost), dim);
-  }
   if (print_array)
   {
     array_printer(const_cast<const cost **>(assigncost), dim);

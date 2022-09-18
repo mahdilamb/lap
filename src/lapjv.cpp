@@ -16,7 +16,8 @@
 *
 *************************************************************************/
 #include <stdio.h>
-#include  "lapjv.hpp"
+#include <vector>
+#include "lapjv.hpp"
 typedef int row;
 typedef int col;
 template <typename cost>
@@ -40,19 +41,15 @@ int lap(int dim,
 
 {
   bool unassignedfound;
-  row i, imin, numfree = 0, prvnumfree, f, i0, k, freerow, *pred, *free;
-  col j, j1, j2, endofpath, last, low, up, *collist, *matches;
-  cost min, h, umin, usubmin, v2, *d;
+  row i, imin, numfree = 0, prvnumfree, f, i0, k, freerow;
+  col j, j1, j2, endofpath, last, low, up;
+  cost min, h, umin, usubmin, v2;
 
-  free = new row[dim];    // list of unassigned rows.
-  collist = new col[dim]; // list of columns to be scanned in various ways.
-  matches = new col[dim]; // counts how many times a row could be assigned.
-  d = new cost[dim];      // 'cost-distance' in augmenting path calculation.
-  pred = new row[dim];    // row-predecessor of column in augmenting/alternating path.
-
-  // init how many times a row will be assigned in the column reduction.
-  for (i = 0; i < dim; i++)
-    matches[i] = 0;
+  std::vector<row> free(dim);       // list of unassigned rows.
+  std::vector<col> collist(dim);    // list of columns to be scanned in various ways.
+  std::vector<col> matches(dim, 0); // counts how many times a row could be assigned.
+  std::vector<cost> d(dim);         // 'cost-distance' in augmenting path calculation.
+  std::vector<row> pred(dim);       // row-predecessor of column in augmenting/alternating path.
 
   // COLUMN REDUCTION
   for (j = dim - 1; j >= 0; j--) // reverse order gives better results.
@@ -279,13 +276,6 @@ int lap(int dim,
     lapcost = lapcost + assigncost[i][j];
   }
 
-  // free reserved memory.
-  delete[] pred;
-  delete[] free;
-  delete[] collist;
-  delete[] matches;
-  delete[] d;
-
   return lapcost;
 }
 template <typename cost>
@@ -295,10 +285,9 @@ void checklap(int dim, cost **assigncost,
   row i;
   col j;
   cost lapcost = 0, redcost = 0;
-  bool *matched;
   char wait;
 
-  matched = new bool[dim];
+  std::vector<bool>matched(dim);
 
   for (i = 0; i < dim; i++)
     for (j = 0; j < dim; j++)
@@ -356,21 +345,20 @@ void checklap(int dim, cost **assigncost,
       break;
     }
 
-  delete[] matched;
   return;
 }
 
 template int lap(int dim,
-        int **assigncost,
-        col *rowsol,
-        row *colsol,
-        int *u,
-        int *v,
-        const int nonassignmentcost);
+                 int **assigncost,
+                 col *rowsol,
+                 row *colsol,
+                 int *u,
+                 int *v,
+                 const int nonassignmentcost);
 
 template void checklap(int dim,
-        int **assigncost,
-        col *rowsol,
-        row *colsol,
-        int *u,
-        int *v);
+                       int **assigncost,
+                       col *rowsol,
+                       row *colsol,
+                       int *u,
+                       int *v);
