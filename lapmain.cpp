@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   std::set<std::string> flags{"--print-array", "--help"};
   std::map<std::string, std::string> arg_descriptions{
       {"--dim", "(int) Dimension of the matrix"},
-      {"--print-array", "If present will print the cost matrix in a form that makes it easier to copy into other languages (e.g. python)"},
+      {"--hide-array", "If present will not print the cost matrix"},
       {"--cost-max", "The upper limit of the random numbers used for the cost matrix"}};
   argmap args{
       {"--dim", [&dim](char *new_dim)
@@ -112,9 +112,9 @@ int main(int argc, char *argv[])
          }
          std::exit(0);
        }},
-      {"--print-array", [&print_array](char *ignored)
+      {"--hide-array", [&print_array](char *ignored)
        {
-         print_array = true;
+         print_array = false;
        }},
       {"--cost-max", [&cost_range](char *new_cost_range)
        {
