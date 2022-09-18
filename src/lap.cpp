@@ -17,14 +17,16 @@
 *************************************************************************/
 
 #include "system.h"
-#include "lap.h"
-
+typedef int row;
+typedef int col;
+template <typename cost>
 int lap(int dim,
         cost **assigncost,
         col *rowsol,
         row *colsol,
         cost *u,
-        cost *v)
+        cost *v,
+        const cost nonassignmentcost)
 
 // input:
 // dim        - problem size
@@ -83,7 +85,7 @@ int lap(int dim,
     else if (matches[i] == 1) // transfer reduction from rows that are assigned once.
     {
       j1 = rowsol[i];
-      min = BIG;
+      min = nonassignmentcost;
       for (j = 0; j < dim; j++)
         if (j != j1)
           if (assigncost[i][j] - v[j] < min)
@@ -110,7 +112,7 @@ int lap(int dim,
       // find minimum and second minimum reduced cost over columns.
       umin = assigncost[i][0] - v[0];
       j1 = 0;
-      usubmin = BIG;
+      usubmin = nonassignmentcost;
       for (j = 1; j < dim; j++)
       {
         h = assigncost[i][j] - v[j];
@@ -176,7 +178,7 @@ int lap(int dim,
     up = 0;  // columns in low..up-1 are to be scanned for current minimum, now none.
              // columns in up..dim-1 are to be considered later to find new minimum,
              // at this stage the list simply contains all columns
-    unassignedfound = FALSE;
+    unassignedfound = false;
     do
     {
       if (up == low) // no more columns to be scanned for current minimum.
@@ -285,17 +287,17 @@ int lap(int dim,
 
   return lapcost;
 }
-
+template <typename cost>
 void checklap(int dim, cost **assigncost,
               col *rowsol, row *colsol, cost *u, cost *v)
 {
   row i;
   col j;
   cost lapcost = 0, redcost = 0;
-  boolean *matched;
+  bool *matched;
   char wait;
 
-  matched = new boolean[dim];
+  matched = new bool[dim];
 
   for (i = 0; i < dim; i++)
     for (j = 0; j < dim; j++)
@@ -319,7 +321,7 @@ void checklap(int dim, cost **assigncost,
     }
 
   for (j = 0; j < dim; j++)
-    matched[j] = FALSE;
+    matched[j] = false;
 
   for (i = 0; i < dim; i++)
     if (matched[rowsol[i]])
@@ -331,7 +333,7 @@ void checklap(int dim, cost **assigncost,
       break;
     }
     else
-      matched[rowsol[i]] = TRUE;
+      matched[rowsol[i]] = true;
 
   for (i = 0; i < dim; i++)
     if (colsol[rowsol[i]] != i)

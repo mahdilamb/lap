@@ -5,11 +5,10 @@
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>     // for seconds()
+#include <time.h> // for seconds()
 
 /*************** FUNCTIONS  *******************/
 
 extern void seedRandom(unsigned int seed);
 
 extern double seconds();
-
