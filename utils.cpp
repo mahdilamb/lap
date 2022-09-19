@@ -8,6 +8,12 @@
 
 #include <functional>
 template <typename T>
+const std::set<T> &empty_set()
+{
+    static const std::set<T> output;
+    return output;
+}
+template <typename T>
 void print(const T **matrix, int dim, int width = -1)
 {
     width = width <= 0 ? 4 : width;
@@ -23,6 +29,28 @@ void print(const T **matrix, int dim, int width = -1)
         for (int j = 0; j < dim; j++)
             std::cout << std::setw(width) << matrix[i][j] << (j != dim - 1 ? "," : "")
                       << " ";
+        std::cout << "]" << (i != dim - 1 ? ",\n" : "");
+    }
+    std::cout << "]" << std::endl;
+}
+template <typename T>
+void highlighted_print(const T **matrix, int dim, const std::set<std::tuple<int, int>> highlight, int width = -1)
+{
+    width = width <= 0 ? 4 : width;
+    std::cout << "[";
+    for (int i = 0; i < dim; i++)
+    {
+        if (i)
+        {
+            std::cout << " ";
+        }
+
+        std::cout << "[ ";
+        for (int j = 0; j < dim; j++)
+        {
+            bool is_highlighted = highlight.contains({i, j});
+            std::cout << (is_highlighted ? "\033[32m" : "") << std::setw(width) << matrix[i][j] << (is_highlighted ? "\033[0m" : "") << (j != dim - 1 ? "," : "") << " ";
+        }
         std::cout << "]" << (i != dim - 1 ? ",\n" : "");
     }
     std::cout << "]" << std::endl;
