@@ -17,17 +17,18 @@
 *************************************************************************/
 #include <stdio.h>
 #include <vector>
-#include "lapjv.hpp"
+#include <limits>
+#include "lap.hpp"
+
 typedef int row;
 typedef int col;
 template <typename cost>
-int lap(int dim,
-        cost **assigncost,
-        col *rowsol,
-        row *colsol,
-        cost *u,
-        cost *v,
-        const cost big)
+int lapjv(int dim,
+          cost **assigncost,
+          col *rowsol,
+          row *colsol,
+          cost *u,
+          cost *v)
 
 // input:
 // dim        - problem size
@@ -44,7 +45,7 @@ int lap(int dim,
   row i, imin, numfree = 0, prvnumfree, f, i0, k, freerow;
   col j, j1, j2, endofpath, last, low, up;
   cost min, h, umin, usubmin, v2;
-
+  static cost big = std::numeric_limits<cost>::max();
   std::vector<row> free(dim);       // list of unassigned rows.
   std::vector<col> collist(dim);    // list of columns to be scanned in various ways.
   std::vector<col> matches(dim, 0); // counts how many times a row could be assigned.
@@ -287,7 +288,7 @@ void checklap(int dim, cost **assigncost,
   cost lapcost = 0, redcost = 0;
   char wait;
 
-  std::vector<bool>matched(dim);
+  std::vector<bool> matched(dim);
 
   for (i = 0; i < dim; i++)
     for (j = 0; j < dim; j++)
@@ -348,13 +349,12 @@ void checklap(int dim, cost **assigncost,
   return;
 }
 
-template int lap(int dim,
-                 int **assigncost,
-                 col *rowsol,
-                 row *colsol,
-                 int *u,
-                 int *v,
-                 const int nonassignmentcost);
+template int lapjv(int dim,
+                   int **assigncost,
+                   col *rowsol,
+                   row *colsol,
+                   int *u,
+                   int *v);
 
 template void checklap(int dim,
                        int **assigncost,

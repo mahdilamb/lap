@@ -1,5 +1,5 @@
-#ifndef __LAPJV_UTILS_ARRAYS
-#define __LAPJV_UTILS_ARRAYS
+#ifndef __LAP_UTILS_ARRAYS
+#define __LAP_UTILS_ARRAYS
 #include <set>
 #include <tuple>
 

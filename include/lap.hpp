@@ -1,16 +1,17 @@
-#ifndef __LAPJV_HPP
-#define __LAPJV_HPP
+#ifndef __LAP_HPP
+#define __LAP_HPP
 
 typedef int row;
 typedef int col;
 template <typename cost>
-int lap(int dim,
+int lapjv(int dim,
         cost **assigncost,
         col *rowsol,
         row *colsol,
         cost *u,
-        cost *v,
-        const cost nonassignmentcost);
+        cost *v);
+
+
 
 template <typename cost>
 void checklap(int dim, cost **assigncost,

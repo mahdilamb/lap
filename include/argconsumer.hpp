@@ -1,5 +1,5 @@
-#ifndef __LAPJV_UTILS_ARGS_CONSUMER
-#define __LAPJV_UTILS_ARGS_CONSUMER
+#ifndef __LAP_UTILS_ARGS_CONSUMER
+#define __LAP_UTILS_ARGS_CONSUMER
 #include <map>
 #include <set>
 #include <string>

@@ -8,7 +8,7 @@
 *
 *************************************************************************/
 
-#include "lapjv.hpp"
+#include "lap.hpp"
 #include "argconsumer.hpp"
 #include "csv.hpp"
 #include "arrays.hpp"
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   u = new int[dim];
   v = new int[dim];
 
-  lapcost = lap<int>(dim, assigncost, rowsol, colsol, u, v, cost_max + 1);
+  lapcost = lapjv<int>(dim, assigncost, rowsol, colsol, u, v);
 
   if (!hide_matrix)
   {
