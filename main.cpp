@@ -9,13 +9,15 @@
 *************************************************************************/
 
 #include "lapjv.hpp"
-#include "utils.cpp"
+#include "argconsumer.hpp"
+#include "csv.hpp"
+#include "arrays.hpp"
+
 #include <stdio.h>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
-typedef int cost;
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +27,7 @@ int main(int argc, char *argv[])
   std::string filepath;
   int dim = 4;
 
-  cost **assigncost, *u, *v, lapcost;
+  int **assigncost, *u, *v, lapcost;
   int i, *colsol;
   int j, *rowsol;
   ArgConsumer arg_consumer{"LAP.JV usage"};
@@ -35,7 +37,7 @@ int main(int argc, char *argv[])
           [&dim, &assigncost, &filepath](char *path)
           {
             filepath = path;
-            dim = read_csv<cost>(assigncost, path, ',', [](const std::string &value)
+            dim = read_csv<int>(assigncost, path, ',', [](const std::string &value)
                                  { return std::stoi(value); });
           },
           "Path to a file to use for calculating LAP.")
@@ -63,16 +65,16 @@ int main(int argc, char *argv[])
 
   if (!filepath.size())
   {
-    assigncost = new cost *[dim];
+    assigncost = new int *[dim];
     for (i = 0; i < dim; i++)
-      assigncost[i] = new cost[dim];
-    fill_random<cost>(assigncost, dim, cost_max);
+      assigncost[i] = new int[dim];
+    fill_random<int>(assigncost, dim, cost_max, 0);
   }
 
   rowsol = new int[dim];
   colsol = new int[dim];
-  u = new cost[dim];
-  v = new cost[dim];
+  u = new int[dim];
+  v = new int[dim];
 
   lapcost = lap<int>(dim, assigncost, rowsol, colsol, u, v, cost_max + 1);
 
@@ -84,7 +86,7 @@ int main(int argc, char *argv[])
       idx.insert({i, colsol[i]});
     }
     std::cout << "Cost matrix: " << std::endl;
-    highlighted_print<cost>(const_cast<const cost **>(assigncost), dim, idx);
+    highlighted_print<int>(const_cast<const int **>(assigncost), dim, idx, -1);
     std::cout << std::endl;
   }
   if (!hide_assignments)
