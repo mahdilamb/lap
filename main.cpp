@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
   v = new cost[dim];
 
   lapcost = lap<int>(dim, assigncost, rowsol, colsol, u, v, cost_max + 1);
-  checklap<int>(dim, assigncost, rowsol, colsol, u, v);
 
   if (!hide_matrix)
   {
@@ -76,6 +75,9 @@ int main(int argc, char *argv[])
   {
     std::cout << std::setw(4) << i << " -> " << colsol[i] << std::endl;
   }
+
+  checklap<int>(dim, assigncost, rowsol, colsol, u, v);
+
   delete[] assigncost;
   delete[] rowsol;
   delete[] colsol;

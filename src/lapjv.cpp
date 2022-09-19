@@ -27,7 +27,7 @@ int lap(int dim,
         row *colsol,
         cost *u,
         cost *v,
-        const cost nonassignmentcost)
+        const cost big)
 
 // input:
 // dim        - problem size
@@ -82,7 +82,7 @@ int lap(int dim,
     else if (matches[i] == 1) // transfer reduction from rows that are assigned once.
     {
       j1 = rowsol[i];
-      min = nonassignmentcost;
+      min = big;
       for (j = 0; j < dim; j++)
         if (j != j1)
           if (assigncost[i][j] - v[j] < min)
@@ -109,7 +109,7 @@ int lap(int dim,
       // find minimum and second minimum reduced cost over columns.
       umin = assigncost[i][0] - v[0];
       j1 = 0;
-      usubmin = nonassignmentcost;
+      usubmin = big;
       for (j = 1; j < dim; j++)
       {
         h = assigncost[i][j] - v[j];
