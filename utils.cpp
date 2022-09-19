@@ -8,8 +8,9 @@
 
 #include <functional>
 template <typename T>
-void print(const T **matrix, int dim, int width = 4)
+void print(const T **matrix, int dim, int width = -1)
 {
+    width = width <= 0 ? 4 : width;
     std::cout << "[";
     for (int i = 0; i < dim; i++)
     {
@@ -18,7 +19,7 @@ void print(const T **matrix, int dim, int width = 4)
             std::cout << " ";
         }
 
-        std::cout << "[";
+        std::cout << "[ ";
         for (int j = 0; j < dim; j++)
             std::cout << std::setw(width) << matrix[i][j] << (j != dim - 1 ? "," : "")
                       << " ";
@@ -27,8 +28,9 @@ void print(const T **matrix, int dim, int width = 4)
     std::cout << "]" << std::endl;
 }
 template <typename T>
-void print(const T *array, int dim, int width = 4)
+void print(const T *array, int dim, int width = -1)
 {
+    width = width <= 0 ? 4 : width;
     std::cout << "[";
     for (int i = 0; i < dim; i++)
     {
