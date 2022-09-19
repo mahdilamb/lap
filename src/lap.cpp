@@ -18,15 +18,14 @@
 #include <stdio.h>
 #include <vector>
 #include <limits>
+#include <cmath>
 #include "lap.hpp"
 
-typedef int row;
-typedef int col;
 template <typename cost>
 int lapjv(int dim,
           cost **assigncost,
-          col *rowsol,
-          row *colsol,
+          int *rowsol,
+          int *colsol,
           cost *u,
           cost *v)
 
@@ -42,15 +41,15 @@ int lapjv(int dim,
 
 {
   bool unassignedfound;
-  row i, imin, numfree = 0, prvnumfree, f, i0, k, freerow;
-  col j, j1, j2, endofpath, last, low, up;
+  int i, imin, numfree = 0, prvnumfree, f, i0, k, freerow;
+  int j, j1, j2, endofpath, last, low, up;
   cost min, h, umin, usubmin, v2;
-  static cost big = std::numeric_limits<cost>::max();
-  std::vector<row> free(dim);       // list of unassigned rows.
-  std::vector<col> collist(dim);    // list of columns to be scanned in various ways.
-  std::vector<col> matches(dim, 0); // counts how many times a row could be assigned.
+  static cost BIG = std::numeric_limits<cost>::max();
+  std::vector<int> free(dim);       // list of unassigned rows.
+  std::vector<int> collist(dim);    // list of columns to be scanned in various ways.
+  std::vector<int> matches(dim, 0); // counts how many times a row could be assigned.
   std::vector<cost> d(dim);         // 'cost-distance' in augmenting path calculation.
-  std::vector<row> pred(dim);       // row-predecessor of column in augmenting/alternating path.
+  std::vector<int> pred(dim);       // row-predecessor of column in augmenting/alternating path.
 
   // COLUMN REDUCTION
   for (j = dim - 1; j >= 0; j--) // reverse order gives better results.
@@ -83,7 +82,7 @@ int lapjv(int dim,
     else if (matches[i] == 1) // transfer reduction from rows that are assigned once.
     {
       j1 = rowsol[i];
-      min = big;
+      min = BIG;
       for (j = 0; j < dim; j++)
         if (j != j1)
           if (assigncost[i][j] - v[j] < min)
@@ -110,7 +109,7 @@ int lapjv(int dim,
       // find minimum and second minimum reduced cost over columns.
       umin = assigncost[i][0] - v[0];
       j1 = 0;
-      usubmin = big;
+      usubmin = BIG;
       for (j = 1; j < dim; j++)
       {
         h = assigncost[i][j] - v[j];
@@ -274,17 +273,16 @@ int lapjv(int dim,
   {
     j = rowsol[i];
     u[i] = assigncost[i][j] - v[j];
-    lapcost = lapcost + assigncost[i][j];
+    lapcost += assigncost[i][j];
   }
 
   return lapcost;
 }
 template <typename cost>
 void checklap(int dim, cost **assigncost,
-              col *rowsol, row *colsol, cost *u, cost *v)
+              int *rowsol, int *colsol, cost *u, cost *v)
 {
-  row i;
-  col j;
+  int i, j;
   cost lapcost = 0, redcost = 0;
   char wait;
 
@@ -348,17 +346,157 @@ void checklap(int dim, cost **assigncost,
 
   return;
 }
+template <typename T>
+int lapsap(int n, T **cost, int *rowsol, int *colsol, T *u,
+           T *v)
+{
 
+  //////////////////////////////////////////////////////////////////////
+  // Min cost bipartite matching via shortest augmenting paths
+  //
+  // This is an O(n^3) implementation of a shortest augmenting path
+  // algorithm for finding min cost perfect matchings in dense
+  // graphs.  In practice, it solves 1000x1000 problems in around 1
+  // second.
+  //
+  //   cost[i][j] = cost for pairing left node i with right node j
+  //   rowsol[i] = index of right node that left node i pairs with
+  //   colsol[j] = index of left node that right node j pairs with
+  //
+  // The values in cost[i][j] may be positive or negative.  To perform
+  // maximization, simply negate the cost[][] matrix.
+  //////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < n; ++i)
+  {
+    u[i] = cost[i][0];
+    for (int j = 1; j < n; ++j)
+      u[i] = std::min(u[i], cost[i][j]);
+  }
+  for (int j = 0; j < n; ++j)
+  {
+    v[j] = cost[0][j] - u[0];
+    for (int i = 1; i < n; ++i)
+      v[j] = std::min(v[j], cost[i][j] - u[i]);
+  }
+
+  // construct primal solution satisfying complementary slackness
+  std::fill_n(rowsol, n, -1);
+  std::fill_n(colsol, n, -1);
+
+  int mated = 0;
+  for (int i = 0; i < n; ++i)
+  {
+    for (int j = 0; j < n; ++j)
+    {
+      if (colsol[j] != -1)
+        continue;
+      if (fabs(cost[i][j] - u[i] - v[j]) < 1e-10)
+      {
+        rowsol[i] = j;
+        colsol[j] = i;
+        mated++;
+        break;
+      }
+    }
+  }
+
+  std::vector<T> dist(n);
+  std::vector<int> dad(n);
+  std::vector<int> seen(n);
+
+  // repeat until primal solution is feasible
+  while (mated < n)
+  {
+
+    // find an unmatched left node
+    int s = 0;
+    while (rowsol[s] != -1)
+      s++;
+
+    // initialize Dijkstra
+    fill(dad.begin(), dad.end(), -1);
+    fill(seen.begin(), seen.end(), 0);
+    for (int k = 0; k < n; k++)
+      dist[k] = cost[s][k] - u[s] - v[k];
+
+    int j = 0;
+    while (true)
+    {
+
+      // find closest
+      j = -1;
+      for (int k = 0; k < n; ++k)
+      {
+        if (seen[k])
+          continue;
+        if (j == -1 || dist[k] < dist[j])
+          j = k;
+      }
+      seen[j] = 1;
+
+      // termination condition
+      if (colsol[j] == -1)
+        break;
+
+      // relax neighbors
+      const int i = colsol[j];
+      for (int k = 0; k < n; ++k)
+      {
+        if (seen[k])
+          continue;
+        const T new_dist = dist[j] + cost[i][k] - u[i] - v[k];
+        if (dist[k] > new_dist)
+        {
+          dist[k] = new_dist;
+          dad[k] = j;
+        }
+      }
+    }
+
+    // update dual variables
+    for (int k = 0; k < n; ++k)
+    {
+      if (k == j || !seen[k])
+        continue;
+      const int i = colsol[k];
+      v[k] += dist[k] - dist[j];
+      u[i] -= dist[k] - dist[j];
+    }
+    u[s] += dist[j];
+
+    // augment along path
+    while (dad[j] >= 0)
+    {
+      const int d = dad[j];
+      colsol[j] = colsol[d];
+      rowsol[colsol[j]] = j;
+      j = d;
+    }
+    colsol[j] = s;
+    rowsol[s] = j;
+
+    mated++;
+  }
+  T lapcost = 0;
+  for (int i = 0; i < n; ++i)
+  {
+    int j = rowsol[i];
+    lapcost += cost[i][j];
+  }
+
+  return lapcost;
+}
 template int lapjv(int dim,
                    int **assigncost,
-                   col *rowsol,
-                   row *colsol,
+                   int *rowsol,
+                   int *colsol,
                    int *u,
                    int *v);
-
+template int lapsap(int n, int **cost, int *rowsol, int *colsol, int *u,
+                    int *v);
 template void checklap(int dim,
                        int **assigncost,
-                       col *rowsol,
-                       row *colsol,
+                       int *rowsol,
+                       int *colsol,
                        int *u,
                        int *v);

@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   u = new int[dim];
   v = new int[dim];
 
-  lapcost = lapjv<int>(dim, assigncost, rowsol, colsol, u, v);
+  lapcost = lapsap<int>(dim, assigncost, rowsol, colsol, u, v);
 
   if (!hide_matrix)
   {
@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     highlighted_print<int>(const_cast<const int **>(assigncost), dim, idx, -1);
     std::cout << std::endl;
   }
+  
   if (!hide_assignments)
   {
     std::cout << "Assignments: " << std::endl;
