@@ -19,13 +19,13 @@
    R. Jonker and A. Volgenant, University of Amsterdam.
 *
 *************************************************************************/
-template <typename cost>
+template <typename T>
 int lapjv(int dim,
-          cost **assigncost,
+          T **assigncost,
           int *rowsol,
           int *colsol,
-          cost *u,
-          cost *v);
+          T *u,
+          T *v);
 /**
 	Min cost bipartite matching via shortest augmenting paths
 
@@ -47,7 +47,7 @@ template <typename T>
 int lapsap(int n, T **cost, int *rowsol, int *colsol, T *u,
             T *v);
 
-template <typename cost>
-void checklap(int dim, cost **assigncost,
-              int *rowsol, int *colsol, cost *u, cost *v);
+template <typename T>
+void checklap(int dim, T **assigncost,
+              int *rowsol, int *colsol, T *u, T *v);
 #endif

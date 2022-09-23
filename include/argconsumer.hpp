@@ -4,6 +4,8 @@
 #include <set>
 #include <string>
 #include <functional>
+#include <stdexcept>
+
 /// @brief Class used to construct an arg consumer. Note that this is just for baking functions directly into the consumer. It is not a parser!
 class ArgConsumer
 {
@@ -16,7 +18,7 @@ private:
     std::map<std::string, std::string> m_descriptions;
     argmap m_actions;
     int m_max_length = 0;
-    bool m_consumed;
+    bool m_consumed = false;
     /// @brief Whether the consumer has been used
     /// @return false if the consumer is yet to be used, otherwise throws an exception
     bool is_consumed() noexcept(false)

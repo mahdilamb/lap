@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <vector>
+#include <limits>
+#include <cmath>
+#include "lap.hpp"
 /************************************************************************
 *
 *  lap.cpp
@@ -15,19 +20,13 @@
    R. Jonker and A. Volgenant, University of Amsterdam.
 *
 *************************************************************************/
-#include <stdio.h>
-#include <vector>
-#include <limits>
-#include <cmath>
-#include "lap.hpp"
-
-template <typename cost>
+template <typename T>
 int lapjv(int dim,
-          cost **assigncost,
+          T **assigncost,
           int *rowsol,
           int *colsol,
-          cost *u,
-          cost *v)
+          T *u,
+          T *v)
 
 // input:
 // dim        - problem size
@@ -43,12 +42,12 @@ int lapjv(int dim,
   bool unassignedfound;
   int i, imin, numfree = 0, prvnumfree, f, i0, k, freerow;
   int j, j1, j2, endofpath, last, low, up;
-  cost min, h, umin, usubmin, v2;
-  static cost BIG = std::numeric_limits<cost>::max();
+  T min, h, umin, usubmin, v2;
+  static T BIG = std::numeric_limits<T>::max();
   std::vector<int> free(dim);       // list of unassigned rows.
   std::vector<int> collist(dim);    // list of columns to be scanned in various ways.
   std::vector<int> matches(dim, 0); // counts how many times a row could be assigned.
-  std::vector<cost> d(dim);         // 'cost-distance' in augmenting path calculation.
+  std::vector<T> d(dim);         // 'cost-distance' in augmenting path calculation.
   std::vector<int> pred(dim);       // row-predecessor of column in augmenting/alternating path.
 
   // COLUMN REDUCTION
@@ -268,7 +267,7 @@ int lapjv(int dim,
   }
 
   // calculate optimal cost.
-  cost lapcost = 0;
+  T lapcost = 0;
   for (i = 0; i < dim; i++)
   {
     j = rowsol[i];
@@ -278,12 +277,12 @@ int lapjv(int dim,
 
   return lapcost;
 }
-template <typename cost>
-void checklap(int dim, cost **assigncost,
-              int *rowsol, int *colsol, cost *u, cost *v)
+template <typename T>
+void checklap(int dim, T **assigncost,
+              int *rowsol, int *colsol, T *u, T *v)
 {
   int i, j;
-  cost lapcost = 0, redcost = 0;
+  T lapcost = 0, redcost = 0;
   char wait;
 
   std::vector<bool> matched(dim);
